@@ -19,37 +19,63 @@
 // Create a card for each of the articles and add the card to the DOM.
 
 axios.get('https://lambda-times-backend.herokuapp.com/articles').then(res => {
-    const data = res.data;
-    const cardInfo = cardCreator(data);
-    cardsContainer.appendChild(cardInfo)
     console.log(res);
+    let obj = res.data.articles;
+    let newArray = Object.keys(obj).map(function(key){
+        return [obj[key]];
+    });
+    let bigArray = [];
+    for (let i=0; i<newArray.length; i++)
+    {
+        for (let j=0; j<newArray[i].length; j++)
+        {
+            for (let k=0; k<newArray[i][j].length; k++)
+            {
+                bigArray.push(newArray[i][j][k]);
+            }
+        }
+    }
+    bigArray.forEach(item => {
+        let card = new cardCreator(item);
+        cardsContainer.appendChild(card);
+    })
+    return obj;
 })
+    .then(res => {
+        console.log('Secong .then', res);
+        res.forEach(item => {
+            let card = new cardCreator(item);
+            cardCreator.appendChild(card);
+        })
+    })
     .catch(err => {
-        console.log("You hit an error", err);
+        console.log("Error", err);
     })
 
 const cardsContainer = document.querySelector('.cards-container');
 
 function cardCreator(obj) {
     const card = document.createElement('div');
-    const headline = document.createElement('div');
+    const head1 = document.createElement('div');
     const author = document.createElement('div');
     const imageContainer = document.createElement('div');
     const image = document.createElement('img');
     const span = document.createElement('span');
 
-    card.appendChild(headline);
+    card.appendChild(head1);
     card.appendChild(author);
     author.appendChild(imageContainer);
     imageContainer.appendChild(image);
     author.appendChild(span);
 
     card.classList.add('card');
-    headline.classList.add('headline');
+    head1.classList.add('headline');
     author.classList.add('author');
     imageContainer.classList.add('img-container');
 
-    headline.textContent = obj.headline;
+    head1.textContent = obj.headline;
+    image.src = obj.authorPhoto;
+    span.textContent = `By ${obj.authorName}`;
 
     return card
 
